@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kerala: The Escape</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black:   #080808;
+      --gray1:   #111111;
+      --gray2:   #1a1a1a;
+      --gray3:   #2a2a2a;
+      --white:   #f5f5f0;
+      --off:     #999990;
+      --green:   #4dff91;
+      --green2:  #1aff6b;
+      --glow:    rgba(77,255,145,0.18);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Urbanist', sans-serif;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── CUSTOM CURSOR ── */
+    #cursor {
+      width: 10px; height: 10px;
+      background: var(--green);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease, opacity 0.3s ease;
+      mix-blend-mode: difference;
+    }
+    #cursor-trail {
+      width: 36px; height: 36px;
+      border: 1px solid rgba(77,255,145,0.4);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.35s cubic-bezier(0.25,1,0.5,1);
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(48px);
+      transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1),
+                  transform 0.9s cubic-bezier(0.22,1,0.36,1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.15s; }
+    .reveal-delay-2 { transition-delay: 0.3s; }
+    .reveal-delay-3 { transition-delay: 0.45s; }
+    .reveal-delay-4 { transition-delay: 0.6s; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 28px 6vw;
+      background: linear-gradient(to bottom, rgba(8,8,8,0.9), transparent);
+      backdrop-filter: blur(8px);
+    }
+    .nav-logo {
+      font-size: 0.85rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--off);
+      font-weight: 400;
+    }
+    .nav-logo span { color: var(--green); }
+    .nav-cta {
+      font-size: 0.8rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--white);
+      background: none; border: 1px solid rgba(245,245,240,0.2);
+      padding: 10px 24px; border-radius: 50px; cursor: none;
+      transition: border-color 0.3s, background 0.3s;
+      text-decoration: none;
+    }
+    .nav-cta:hover { border-color: var(--green); background: var(--glow); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 6vw 10vh;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1800&q=80');
+      background-size: cover; background-position: center 30%;
+      filter: brightness(0.32);
+      transform: scale(1.05);
+      animation: subtle-zoom 18s ease-in-out infinite alternate;
+    }
+    @keyframes subtle-zoom {
+      from { transform: scale(1.05); }
+      to   { transform: scale(1.12); }
+    }
+    .hero-noise {
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.5; pointer-events: none;
+    }
+    .hero-gradient {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, var(--black) 0%, transparent 55%);
+    }
+    .hero-eyebrow {
+      position: relative; z-index: 2;
+      font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--green); margin-bottom: 20px;
+      font-weight: 500;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .hero-eyebrow::before {
+      content: ''; display: block;
+      width: 40px; height: 1px; background: var(--green);
+    }
+    h1 {
+      position: relative; z-index: 2;
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(3.2rem, 11vw, 11rem);
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      font-weight: 400;
+      margin-bottom: 32px;
+    }
+    h1 em { font-style: italic; color: var(--green); }
+    .hero-sub {
+      position: relative; z-index: 2;
+      font-size: clamp(1rem, 2.2vw, 1.35rem);
+      color: var(--off); font-weight: 300;
+      letter-spacing: 0.04em; max-width: 520px;
+      line-height: 1.6;
+    }
+    .hero-scroll-hint {
+      position: absolute; bottom: 36px; right: 6vw;
+      z-index: 2; display: flex; align-items: center;
+      gap: 12px; color: var(--off);
+      font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+      animation: bounce 2.5s ease-in-out infinite;
+    }
+    @keyframes bounce {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(8px); }
+    }
+    .hero-scroll-hint svg { opacity: 0.5; }
+
+    /* ── SECTION BASE ── */
+    section {
+      padding: clamp(80px, 14vw, 160px) 6vw;
+      position: relative;
+    }
+    .section-label {
+      font-size: 0.72rem; letter-spacing: 0.32em;
+      text-transform: uppercase; color: var(--green);
+      font-weight: 600; margin-bottom: 48px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .section-label::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(to right, var(--gray3), transparent);
+      max-width: 160px;
+    }
+
+    /* ── PROBLEM ── */
+    #problem { background: var(--gray1); }
+    .problem-number {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(7rem, 22vw, 22rem);
+      line-height: 0.85; color: var(--gray2);
+      position: absolute; right: 4vw; top: 40px;
+      user-select: none; pointer-events: none;
+      font-weight: 400;
+    }
+    .problem-headline {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 5.5vw, 5rem);
+      line-height: 1.1; font-weight: 400;
+      max-width: 640px; position: relative; z-index: 2;
+      margin-bottom: 40px;
+    }
+    .problem-headline em { font-style: italic; color: var(--off); }
+    .problem-body {
+      font-size: clamp(1rem, 1.8vw, 1.2rem);
+      color: var(--off); font-weight: 300;
+      line-height: 1.8; max-width: 520px;
+      position: relative; z-index: 2;
+    }
+
+    /* ── SOLUTION ── */
+    #solution {
+      background: var(--black);
+      text-align: center;
+      padding-top: clamp(100px, 18vw, 200px);
+      padding-bottom: clamp(100px, 18vw, 200px);
+    }
+    .solution-days {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(6rem, 26vw, 26rem);
+      line-height: 0.85; color: var(--green);
+      letter-spacing: -0.04em; display: block;
+      text-shadow: 0 0 120px var(--glow);
+      animation: pulse-glow 4s ease-in-out infinite alternate;
+    }
+    @keyframes pulse-glow {
+      from { text-shadow: 0 0 80px rgba(77,255,145,0.2); }
+      to   { text-shadow: 0 0 160px rgba(77,255,145,0.4); }
+    }
+    .solution-label {
+      font-size: clamp(1.4rem, 3.5vw, 3rem);
+      font-weight: 200; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--white);
+      margin-top: 12px; display: block;
+    }
+    .solution-tagline {
+      margin-top: 52px;
+      font-size: clamp(1rem, 2vw, 1.4rem);
+      color: var(--off); font-weight: 300;
+      line-height: 1.7; max-width: 600px; margin-inline: auto;
+      letter-spacing: 0.02em;
+    }
+    .solution-tagline strong { color: var(--white); font-weight: 500; }
+    .solution-pills {
+      display: flex; justify-content: center;
+      flex-wrap: wrap; gap: 12px; margin-top: 52px;
+    }
+    .pill {
+      border: 1px solid var(--gray3);
+      padding: 10px 24px; border-radius: 50px;
+      font-size: 0.82rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--off);
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .pill:hover { border-color: var(--green); color: var(--green); }
+
+    /* ── DESTINATIONS ── */
+    #destinations { background: var(--black); padding-top: 0; }
+    .destinations-header {
+      text-align: center;
+      padding-bottom: clamp(60px, 8vw, 100px);
+    }
+    .destinations-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.2rem, 6vw, 5.5rem);
+      font-weight: 400; line-height: 1.1;
+    }
+    .destinations-title em { font-style: italic; color: var(--green); }
+    .dest-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .dest-card {
+      position: relative; overflow: hidden;
+      aspect-ratio: 3/4;
+      cursor: none;
+    }
+    .dest-card img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.8s cubic-bezier(0.22,1,0.36,1), filter 0.6s ease;
+      filter: brightness(0.5) saturate(0.7);
+    }
+    .dest-card:hover img {
+      transform: scale(1.07);
+      filter: brightness(0.65) saturate(0.9);
+    }
+    .dest-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(8,8,8,0.95) 0%, transparent 55%);
+      display: flex; flex-direction: column;
+      justify-content: flex-end; padding: 32px 28px;
+    }
+    .dest-num {
+      font-size: 0.7rem; letter-spacing: 0.3em;
+      color: var(--green); font-weight: 600;
+      text-transform: uppercase; margin-bottom: 10px;
+    }
+    .dest-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.5rem, 3.5vw, 2.8rem);
+      font-weight: 400; line-height: 1.0;
+      margin-bottom: 10px;
+    }
+    .dest-tagline {
+      font-size: 0.82rem; color: var(--off);
+      font-weight: 300; letter-spacing: 0.06em;
+      line-height: 1.5;
+    }
+    .dest-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      border: 1px solid transparent;
+      transition: border-color 0.4s;
+      pointer-events: none;
+    }
+    .dest-card:hover::after { border-color: rgba(77,255,145,0.25); }
+
+    /* ── WOW FACTOR ── */
+    #wow {
+      min-height: 90vh;
+      display: flex; align-items: center;
+      position: relative; overflow: hidden;
+    }
+    .wow-bg {
+      position: absolute; inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1593693397690-362cb9666fc2?w=1800&q=80');
+      background-size: cover; background-position: center;
+      filter: brightness(0.22);
+      transform: scale(1.05);
+    }
+    .wow-bg-overlay {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(77,255,145,0.06), transparent 70%),
+                  linear-gradient(to right, rgba(8,8,8,0.8) 40%, transparent 100%);
+    }
+    .wow-content {
+      position: relative; z-index: 2;
+      max-width: 700px;
+    }
+    .wow-eyebrow {
+      font-size: 0.72rem; letter-spacing: 0.32em;
+      text-transform: uppercase; color: var(--green);
+      font-weight: 600; margin-bottom: 28px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .wow-eyebrow::before { content: ''; width: 40px; height: 1px; background: var(--green); }
+    .wow-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.6rem, 7vw, 6.5rem);
+      font-weight: 400; line-height: 1.0;
+      margin-bottom: 28px;
+    }
+    .wow-title em { font-style: italic; color: var(--green); }
+    .wow-subtitle {
+      font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+      color: var(--off); font-weight: 300;
+      line-height: 1.8; max-width: 500px; margin-bottom: 48px;
+    }
+    .wow-stat-row {
+      display: flex; gap: 48px; flex-wrap: wrap;
+    }
+    .wow-stat { display: flex; flex-direction: column; gap: 4px; }
+    .wow-stat-num {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      color: var(--green); line-height: 1;
+    }
+    .wow-stat-label {
+      font-size: 0.72rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--off);
+    }
+
+    /* ── ITINERARY STRIP ── */
+    #itinerary { background: var(--gray1); overflow: hidden; }
+    .itinerary-header { margin-bottom: 60px; }
+    .itinerary-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 5vw, 4.5rem);
+      font-weight: 400; margin-bottom: 16px;
+    }
+    .itinerary-sub {
+      font-size: 1rem; color: var(--off);
+      font-weight: 300; letter-spacing: 0.04em;
+    }
+    .itin-list {
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .itin-item {
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      align-items: center;
+      gap: 32px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--gray2);
+      transition: background 0.3s;
+      position: relative;
+    }
+    .itin-item::before {
+      content: '';
+      position: absolute; left: -6vw; right: -6vw; top: 0; bottom: 0;
+      background: transparent;
+      transition: background 0.3s;
+      z-index: 0;
+    }
+    .itin-item:hover::before { background: rgba(77,255,145,0.03); }
+    .itin-day {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      color: var(--gray3); font-weight: 400;
+      position: relative; z-index: 1;
+      transition: color 0.3s;
+    }
+    .itin-item:hover .itin-day { color: var(--green); }
+    .itin-info { position: relative; z-index: 1; }
+    .itin-place {
+      font-size: clamp(1rem, 2vw, 1.3rem);
+      font-weight: 500; margin-bottom: 4px;
+    }
+    .itin-desc {
+      font-size: 0.87rem; color: var(--off);
+      font-weight: 300; letter-spacing: 0.02em;
+    }
+    .itin-tag {
+      font-size: 0.68rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--green);
+      border: 1px solid rgba(77,255,145,0.25);
+      padding: 6px 14px; border-radius: 50px;
+      white-space: nowrap; position: relative; z-index: 1;
+    }
+
+    /* ── CTA ── */
+    #cta {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-bg {
+      position: absolute; inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1623501381218-bf6f8b0c7e26?w=1800&q=80');
+      background-size: cover; background-position: center;
+      filter: brightness(0.2) saturate(0.5);
+    }
+    .cta-glow {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 50%, rgba(77,255,145,0.12), transparent 70%);
+    }
+    .cta-eyebrow {
+      font-size: 0.72rem; letter-spacing: 0.32em;
+      text-transform: uppercase; color: var(--green);
+      font-weight: 600; position: relative; z-index: 2;
+      margin-bottom: 28px;
+    }
+    .cta-headline {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(3rem, 10vw, 9.5rem);
+      font-weight: 400; line-height: 0.95;
+      position: relative; z-index: 2;
+      margin-bottom: 28px;
+    }
+    .cta-headline em { font-style: italic; color: var(--green); }
+    .cta-sub {
+      font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+      color: var(--off); font-weight: 300;
+      line-height: 1.7; max-width: 480px;
+      position: relative; z-index: 2; margin-bottom: 56px;
+    }
+    .cta-button {
+      position: relative; z-index: 2;
+      background: var(--green); color: var(--black);
+      font-family: 'Urbanist', sans-serif;
+      font-size: clamp(0.9rem, 1.5vw, 1rem);
+      font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase;
+      border: none; padding: 20px 56px;
+      border-radius: 50px; cursor: none;
+      transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+      text-decoration: none; display: inline-block;
+    }
+    .cta-button:hover {
+      background: var(--green2);
+      transform: translateY(-3px);
+      box-shadow: 0 20px 60px rgba(77,255,145,0.35);
+    }
+    .cta-note {
+      position: relative; z-index: 2;
+      margin-top: 24px; font-size: 0.78rem;
+      color: var(--off); letter-spacing: 0.1em;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--gray1);
+      padding: 48px 6vw;
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 20px;
+      border-top: 1px solid var(--gray2);
+    }
+    .footer-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem; font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+    .footer-logo span { color: var(--green); }
+    .footer-tagline {
+      font-size: 0.78rem; color: var(--off);
+      letter-spacing: 0.12em; text-transform: uppercase;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .dest-grid { grid-template-columns: 1fr; }
+      .dest-card { aspect-ratio: 4/3; }
+
+      .itin-item {
+        grid-template-columns: 56px 1fr;
+        gap: 16px;
+      }
+      .itin-tag { display: none; }
+
+      .wow-stat-row { gap: 32px; }
+
+      footer { flex-direction: column; text-align: center; }
+
+      body { cursor: auto; }
+      #cursor, #cursor-trail { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      nav { padding: 20px 5vw; }
+      .nav-cta { padding: 8px 18px; font-size: 0.72rem; }
+    }
+
+    /* ── HORIZONTAL RULE ACCENT ── */
+    .accent-line {
+      width: 48px; height: 2px;
+      background: var(--green); margin-bottom: 32px;
+    }
+
+    /* ── MARQUEE ── */
+    .marquee-wrap {
+      overflow: hidden; border-top: 1px solid var(--gray2);
+      border-bottom: 1px solid var(--gray2);
+      padding: 20px 0; background: var(--gray1);
+    }
+    .marquee-track {
+      display: flex; gap: 64px;
+      animation: marquee 20s linear infinite;
+      width: max-content;
+    }
+    .marquee-item {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem; font-style: italic;
+      color: var(--off); white-space: nowrap; opacity: 0.4;
+    }
+    .marquee-item.accent { color: var(--green); opacity: 0.7; }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CURSOR -->
+  <div id="cursor"></div>
+  <div id="cursor-trail"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">Kerala <span>·</span> The Escape</div>
+    <a href="#cta" class="nav-cta">Book Now</a>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-noise"></div>
+    <div class="hero-gradient"></div>
+
+    <div class="hero-eyebrow reveal">South India · 9 Days</div>
+    <h1 class="reveal reveal-delay-1">Kerala:<br><em>The Escape</em></h1>
+    <p class="hero-sub reveal reveal-delay-2">
+      A nine-day journey from the misty peaks of Munnar<br>
+      to the golden shores of the Arabian Sea.
+    </p>
+
+    <div class="hero-scroll-hint">
+      Scroll
+      <svg width="14" height="22" viewBox="0 0 14 22" fill="none">
+        <rect x="1" y="1" width="12" height="20" rx="6" stroke="white" stroke-width="1.2"/>
+        <circle cx="7" cy="7" r="2" fill="white">
+          <animate attributeName="cy" values="7;13;7" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0;1" dur="2s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span class="marquee-item">Munnar</span>
+      <span class="marquee-item accent">·</span>
+      <span class="marquee-item">Alleppey</span>
+      <span class="marquee-item accent">·</span>
+      <span class="marquee-item">Kovalam</span>
+      <span class="marquee-item accent">·</span>
+      <span class="marquee-item">Jatayu</span>
+      <span class="marquee-item accent">·</span>
+      <span class="marquee-item">Thekkady</span>
+      <span class="marquee-item accent">·</span>
+      <span class="marquee-item">Wayanad</span>
+      <span class="marquee-item accent">·</span>
+      <span class="marquee-item">Munnar</span>
+      <span class="marquee-item accent">·</span>
+      <span class="marquee-item">Alleppey</span>
+      <span class="marquee-item accent">·</span>
+      <span class="marquee-item">Kovalam</span>
+      <span class="marquee-item accent">·</span>
+      <span class="marquee-item">Jatayu</span>
+      <span class="marquee-item accent">·</span>
+      <span class="marquee-item">Thekkady</span>
+      <span class="marquee-item accent">·</span>
+      <span class="marquee-item">Wayanad</span>
+      <span class="marquee-item accent">·</span>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="problem-number reveal">02</div>
+    <div class="section-label reveal">The Reality</div>
+    <h2 class="problem-headline reveal reveal-delay-1">
+      Planning a vacation<br>
+      <em>shouldn't feel like</em><br>
+      a second job.
+    </h2>
+    <p class="problem-body reveal reveal-delay-2">
+      Endless tabs. Conflicting reviews. Overpriced hotels hidden behind affiliate links. 
+      You spend three weeks planning and still arrive unsure. 
+      Kerala deserves better. <em style="color: var(--white)">You</em> deserve better.
+    </p>
+  </section>
+
+  <!-- SOLUTION -->
+  <section id="solution">
+    <div class="section-label reveal" style="justify-content:center">The Answer</div>
+    <span class="solution-days reveal reveal-delay-1">09</span>
+    <span class="solution-label reveal reveal-delay-2">Days. Zero Stress.</span>
+    <p class="solution-tagline reveal reveal-delay-3">
+      One curated itinerary, <strong>meticulously designed</strong> to take you from 
+      the mountains to the backwaters to the sea — without a single moment wasted.
+    </p>
+    <div class="solution-pills reveal reveal-delay-4">
+      <span class="pill">All Transfers Included</span>
+      <span class="pill">Handpicked Stays</span>
+      <span class="pill">Local Guides</span>
+      <span class="pill">24/7 Concierge</span>
+      <span class="pill">Curated Experiences</span>
+    </div>
+  </section>
+
+  <!-- DESTINATIONS -->
+  <section id="destinations">
+    <div class="destinations-header">
+      <div class="section-label reveal">Three Worlds, One Journey</div>
+      <h2 class="destinations-title reveal reveal-delay-1">
+        From peaks to<br><em>mirrors to gold.</em>
+      </h2>
+    </div>
+    <div class="dest-grid">
+      <div class="dest-card reveal">
+        <img
+          src="https://images.unsplash.com/photo-1591017403286-fd8493524e1e?w=900&q=80"
+          alt="Munnar tea hills"
+          loading="lazy"
+        />
+        <div class="dest-overlay">
+          <div class="dest-num">01 — Munnar</div>
+          <div class="dest-name">Misty<br>Peaks</div>
+          <div class="dest-tagline">Tea gardens at 6,000 ft.<br>The air feels different here.</div>
+        </div>
+      </div>
+      <div class="dest-card reveal reveal-delay-1">
+        <img
+          src="https://images.unsplash.com/photo-1603125011705-0d080e28d9ba?w=900&q=80"
+          alt="Alleppey backwaters"
+          loading="lazy"
+        />
+        <div class="dest-overlay">
+          <div class="dest-num">02 — Alleppey</div>
+          <div class="dest-name">Mirror<br>Rivers</div>
+          <div class="dest-tagline">Houseboat nights. Silence.<br>The sky touching the water.</div>
+        </div>
+      </div>
+      <div class="dest-card reveal reveal-delay-2">
+        <img
+          src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=900&q=80"
+          alt="Kovalam beach"
+          loading="lazy"
+        />
+        <div class="dest-overlay">
+          <div class="dest-num">03 — Kovalam</div>
+          <div class="dest-name">Golden<br>Shores</div>
+          <div class="dest-tagline">Lighthouse cliffs. Warm waves.<br>The perfect final chapter.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WOW FACTOR -->
+  <section id="wow">
+    <div class="wow-bg"></div>
+    <div class="wow-bg-overlay"></div>
+    <div class="wow-content">
+      <div class="wow-eyebrow reveal">Day 07 — The Highlight</div>
+      <h2 class="wow-title reveal reveal-delay-1">
+        Witness history at the<br>world's largest<br><em>bird sculpture.</em>
+      </h2>
+      <p class="wow-subtitle reveal reveal-delay-2">
+        Jatayu Earth's Center rises 200 feet from a mountaintop in Chadayamangalam — 
+        half myth, half engineering marvel. Nothing prepares you for the scale.
+      </p>
+      <div class="wow-stat-row reveal reveal-delay-3">
+        <div class="wow-stat">
+          <span class="wow-stat-num">200<span style="font-size:0.5em;color:var(--off)">ft</span></span>
+          <span class="wow-stat-label">Height</span>
+        </div>
+        <div class="wow-stat">
+          <span class="wow-stat-num">650<span style="font-size:0.5em;color:var(--off)">ft</span></span>
+          <span class="wow-stat-label">Wingspan</span>
+        </div>
+        <div class="wow-stat">
+          <span class="wow-stat-num">#1</span>
+          <span class="wow-stat-label">World Record</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ITINERARY -->
+  <section id="itinerary">
+    <div class="itinerary-header">
+      <div class="section-label reveal">Full Itinerary</div>
+      <h2 class="itinerary-title reveal reveal-delay-1">Nine perfect days.</h2>
+      <p class="itinerary-sub reveal reveal-delay-2">Every moment, already planned.</p>
+    </div>
+    <div class="itin-list">
+      <div class="itin-item reveal">
+        <div class="itin-day">01</div>
+        <div class="itin-info">
+          <div class="itin-place">Arrival — Cochin</div>
+          <div class="itin-desc">Colonial spice streets, sunset harbour cruise, Fort Kochi evening walk.</div>
+        </div>
+        <div class="itin-tag">Arrival</div>
+      </div>
+      <div class="itin-item reveal reveal-delay-1">
+        <div class="itin-day">02</div>
+        <div class="itin-info">
+          <div class="itin-place">Cochin → Munnar</div>
+          <div class="itin-desc">Scenic mountain drive through rubber and spice plantations.</div>
+        </div>
+        <div class="itin-tag">Mountains</div>
+      </div>
+      <div class="itin-item reveal reveal-delay-2">
+        <div class="itin-day">03</div>
+        <div class="itin-info">
+          <div class="itin-place">Munnar — Tea Country</div>
+          <div class="itin-desc">Dawn at Eravikulam National Park. Nilgiri Tahr spotting. Private tea tasting.</div>
+        </div>
+        <div class="itin-tag">Nature</div>
+      </div>
+      <div class="itin-item reveal">
+        <div class="itin-day">04</div>
+        <div class="itin-info">
+          <div class="itin-place">Munnar → Thekkady</div>
+          <div class="itin-desc">Periyar Tiger Reserve boat safari. Spice garden trail at dusk.</div>
+        </div>
+        <div class="itin-tag">Wildlife</div>
+      </div>
+      <div class="itin-item reveal reveal-delay-1">
+        <div class="itin-day">05</div>
+        <div class="itin-info">
+          <div class="itin-place">Thekkady → Alleppey</div>
+          <div class="itin-desc">Houseboat embarkation. Lazy drift through ancient canals. Sunset on deck.</div>
+        </div>
+        <div class="itin-tag">Backwaters</div>
+      </div>
+      <div class="itin-item reveal reveal-delay-2">
+        <div class="itin-day">06</div>
+        <div class="itin-info">
+          <div class="itin-place">Alleppey Backwaters</div>
+          <div class="itin-desc">Dawn mist on the lake. Village stops. Traditional Kerala lunch onboard.</div>
+        </div>
+        <div class="itin-tag">Backwaters</div>
+      </div>
+      <div class="itin-item reveal">
+        <div class="itin-day">07</div>
+        <div class="itin-info">
+          <div class="itin-place">Jatayu Earth's Center</div>
+          <div class="itin-desc">The world's largest bird sculpture. Cable car ascent. Panoramic Kerala views.</div>
+        </div>
+        <div class="itin-tag highlight" style="color:var(--green);border-color:rgba(77,255,145,0.5)">★ Highlight</div>
+      </div>
+      <div class="itin-item reveal reveal-delay-1">
+        <div class="itin-day">08</div>
+        <div class="itin-info">
+          <div class="itin-place">Kovalam Beach</div>
+          <div class="itin-desc">Lighthouse Bay. Ayurvedic massage. Kerala seafood at cliff-top restaurant.</div>
+        </div>
+        <div class="itin-tag">Coast</div>
+      </div>
+      <div class="itin-item reveal reveal-delay-2">
+        <div class="itin-day">09</div>
+        <div class="itin-info">
+          <div class="itin-place">Trivandrum — Departure</div>
+          <div class="itin-desc">Padmanabhaswamy Temple. One last morning on the beach. Farewell Kerala.</div>
+        </div>
+        <div class="itin-tag">Departure</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="cta">
+    <div class="cta-bg"></div>
+    <div class="cta-glow"></div>
+    <div class="cta-eyebrow reveal">Your Turn</div>
+    <h2 class="cta-headline reveal reveal-delay-1">
+      Kerala<br>is <em>waiting.</em>
+    </h2>
+    <p class="cta-sub reveal reveal-delay-2">
+      Spots are limited and fill fast. Take the first step toward 
+      nine days of pure, effortless wonder.
+    </p>
+    <a href="#" class="cta-button reveal reveal-delay-3">Start Your Journey</a>
+    <p class="cta-note reveal reveal-delay-4">No commitment. Free consultation. Fully customisable.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Kerala<span>.</span></div>
+    <div class="footer-tagline">© 2025 Kerala: The Escape · All Rights Reserved</div>
+  </footer>
+
+  <script>
+    // ── CURSOR ──
+    const cursor = document.getElementById('cursor');
+    const trail  = document.getElementById('cursor-trail');
+    let mx = 0, my = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.transform = `translate(${mx - 5}px, ${my - 5}px)`;
+    });
+
+    let tx = 0, ty = 0;
+    function animateTrail() {
+      tx += (mx - tx) * 0.12;
+      ty += (my - ty) * 0.12;
+      trail.style.transform = `translate(${tx - 18}px, ${ty - 18}px)`;
+      requestAnimationFrame(animateTrail);
+    }
+    animateTrail();
+
+    document.querySelectorAll('a, button, .dest-card, .itin-item').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.transform += ' scale(2)';
+        trail.style.transform  += ' scale(1.5)';
+        trail.style.borderColor = 'rgba(77,255,145,0.7)';
+      });
+      el.addEventListener('mouseleave', () => {
+        trail.style.borderColor = 'rgba(77,255,145,0.4)';
+      });
+    });
+
+    // ── SCROLL REVEAL ──
+    const revealEls = document.querySelectorAll('.reveal');
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            observer.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+
+    revealEls.forEach(el => observer.observe(el));
+
+    // ── HERO immediate reveal ──
+    document.querySelectorAll('#hero .reveal').forEach((el, i) => {
+      setTimeout(() => el.classList.add('visible'), 300 + i * 180);
+    });
+
+    // ── PARALLAX hero bg ──
+    const heroBg = document.querySelector('.hero-bg');
+    window.addEventListener('scroll', () => {
+      const sy = window.scrollY;
+      if (heroBg && sy < window.innerHeight) {
+        heroBg.style.transform = `scale(1.05) translateY(${sy * 0.25}px)`;
+      }
+    }, { passive: true });
+  </script>
+</body>
+</html>
