@@ -558,7 +558,81 @@
       from { transform: translateX(0); }
       to   { transform: translateX(-50%); }
     }
-  </style>
+  
+/* ── LIGHT THEME ── */
+body.light-theme {
+  --black: #f4f4ef;
+  --gray1: #ffffff;
+  --gray2: #e9e9e0;
+  --gray3: #d8d8d0;
+  --white: #111111;
+  --off: #555555;
+  --green: #008f4c;
+  --green2: #00b35f;
+  --glow: rgba(0,143,76,0.12);
+}
+
+.theme-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
+  background: var(--green);
+  color: var(--black);
+  border: none;
+  padding: 12px 18px;
+  border-radius: 50px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+/* ── BOOKING FORM ── */
+.booking-section {
+  background: var(--gray1);
+  padding: 100px 6vw;
+}
+
+.booking-form {
+  max-width: 700px;
+  margin: 0 auto;
+  display: grid;
+  gap: 20px;
+}
+
+.booking-form input,
+.booking-form textarea,
+.booking-form select {
+  width: 100%;
+  padding: 18px;
+  background: var(--gray2);
+  border: 1px solid var(--gray3);
+  color: var(--white);
+  border-radius: 12px;
+  font-size: 1rem;
+}
+
+.booking-form button {
+  background: var(--green);
+  color: var(--black);
+  border: none;
+  padding: 18px;
+  border-radius: 50px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.booking-success {
+  display: none;
+  margin-top: 20px;
+  color: var(--green);
+  text-align: center;
+  font-weight: 600;
+}
+
+</style>
 </head>
 <body>
 
@@ -822,6 +896,35 @@
     </div>
   </section>
 
+  
+<!-- BOOKING -->
+<section class="booking-section" id="booking">
+  <div class="section-label">Book Your Escape</div>
+  <h2 class="itinerary-title">Start planning today.</h2>
+
+  <form class="booking-form" id="bookingForm">
+    <input type="text" name="name" placeholder="Full Name" required />
+    <input type="email" name="email" placeholder="Email Address" required />
+    <input type="tel" name="phone" placeholder="Phone Number" required />
+
+    <select name="travelers">
+      <option>1 Traveler</option>
+      <option>2 Travelers</option>
+      <option>3-5 Travelers</option>
+      <option>6+ Travelers</option>
+    </select>
+
+    <textarea name="notes" rows="5" placeholder="Tell us about your dream Kerala trip..."></textarea>
+
+    <button type="submit">Request Consultation</button>
+
+    <div class="booking-success" id="bookingSuccess">
+      Your request has been submitted successfully.
+    </div>
+  </form>
+</section>
+
+
   <!-- CTA -->
   <section id="cta">
     <div class="cta-bg"></div>
@@ -905,6 +1008,63 @@
         heroBg.style.transform = `scale(1.05) translateY(${sy * 0.25}px)`;
       }
     }, { passive: true });
-  </script>
+  
+// ── THEME TOGGLE ──
+const themeToggle = document.getElementById('themeToggle');
+
+themeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('light-theme');
+
+  const mode = document.body.classList.contains('light-theme')
+    ? 'light'
+    : 'dark';
+
+  localStorage.setItem('theme', mode);
+});
+
+if (localStorage.getItem('theme') === 'light') {
+  document.body.classList.add('light-theme');
+}
+
+// ── BOOKING FORM BACKEND INTEGRATION ──
+const bookingForm = document.getElementById('bookingForm');
+const bookingSuccess = document.getElementById('bookingSuccess');
+
+bookingForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const formData = {
+    name: bookingForm.name.value,
+    email: bookingForm.email.value,
+    phone: bookingForm.phone.value,
+    travelers: bookingForm.travelers.value,
+    notes: bookingForm.notes.value,
+  };
+
+  try {
+    // Replace with your backend endpoint
+    const response = await fetch('https://your-api.com/bookings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (response.ok) {
+      bookingSuccess.style.display = 'block';
+      bookingForm.reset();
+    } else {
+      alert('Something went wrong.');
+    }
+  } catch (err) {
+    alert('Server connection failed.');
+  }
+});
+
+</script>
+
+<button class="theme-toggle" id="themeToggle">Toggle Theme</button>
+
 </body>
 </html>
